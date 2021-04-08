@@ -1,0 +1,143 @@
+
+sudo nano test.py
+print('Hello Server')
+ctrl + x, y, enter
+
+
+sudo apt-get update && apt-get upgrade
+
+hostnamectl set-hostname django-server
+hostname
+
+nano /etc/hosts
+178.128.104.46 django-server
+
+sudo adduser shipmentadmin
+sudo adduser shipmentadmin sudo
+
+login
+user: shipmentadmin
+pass: xxx
+
+ls (for checking project folder)
+
+sudo apt-get install ufw
+sudo ufw default allow outgoing
+sudo ufw default deny incoming
+
+sudo ufw allow 8000
+sudo ufw allow 22
+sudo ufw enable
+sudo ufw status
+
+sudo apt-get install python3-pip
+
+sudo apt-get install python3-venv
+
+sudo python3 -m venv venv
+
+
+source ./venv/bin/activate
+
+
+cd .. (main folder of user (desktop))
+
+sudo chown -R 777 'venv'
+sudo chmod -R 777 'venv'
+
+Goto FileZilla and Upload your project to 
+/home/shipmentadmin/
+
+sudo chown -R 777 'shipment'
+sudo chmod -R 777 'shipment'
+
+pip install --upgrade pip
+pip install django==3.0
+pip install pillow
+
+cd shipment
+
+python manage.py runserver 0.0.0.0:8000
+
+screen -S runserver
+screen -d (check all screen)
+ctrl + a, d (resume to main cmd)
+screen -r runserver
+
+edit settings.py: before: STATIC_URL
+STATIC_ROOT = os.path.join(BASE_DIR,'static')
+
+edit (join main path to template folder)
+----------------------
+TEMPLATES = [
+    {
+        'DIRS': [BASE_DIR / 'tracking/template')], }
+----------------------
+activate venv
+
+python manage.py collectstatic
+
+sudo apt-get install apache2
+
+sudo apt-get install libapache2-mod-wsgi-py3
+
+cd /etc/apache2/sites-available/
+we will found: 000-default.conf >>> copy this file to django_project.conf
+sudo cp 000-default.conf django_project.conf
+
+sudo nano django_project.conf
+
+copy text in this file: command2.txt
+paste before </VirtualHost>
+
+sudo a2ensite django_project
+sudo a2dissite 000-default.conf
+
+>> go out user desktop
+sudo chown :www-data shipment/db.sqlite3
+sudo chmod 664 shipment/db.sqlite3
+sudo chown :www-data shipment/
+
+
+if you no 'media' folder
+	cd shipment
+	mkdir media
+	cd ..
+
+sudo chown -R :www-data shipment/media
+sudo chown -R 775 shipment/media
+
+-------------
+
+sudo ufw delete allow 8000
+sudo ufw allow http/tcp
+sudo service apache2 restart
+
+
+
+=========================
+
+
+Alias /static /home/shipmentadmin/shipment/static
+	<Directory /home/shipmentadmin/shipment/static>
+		Require all granted
+	</Directory>
+
+	Alias /media /home/shipmentadmin/shipment/media
+	<Directory /home/shipmentadmin/shipment/media>
+		Require all granted
+	</Directory>
+
+	<Directory /home/shipmentadmin/shipment/shipment>
+                <Files wsgi.py>
+			Require all granted
+		</Files>
+        </Directory>
+
+	WSGIScriptAlias / /home/shipmentadmin/shipment/shipment/wsgi.py
+	WSGIDaemonProcess django_app python-path=/home/shipmentadmin/shipment python-home=/home/shipmentadmin/venv
+	WSGIProcessGroup django_app
+
+
+
+command detail: https://docs.google.com/document/d/1L6ALpby7SJAM1xpNWYKeuz3VfCw7SSYnTSse6UsU704/edit?usp=sharing
